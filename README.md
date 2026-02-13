@@ -210,7 +210,7 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 ## 👨‍💻 Desenvolvido por
 
-Desenvolvido com ❤️ e ☕ por [seu-nome](https://github.com/seu-usuario)
+Desenvolvido com ❤️ e ☕ por [Flávia Correia](https://github.com/fllaviacorreia)
 
 ---
 
