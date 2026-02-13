@@ -28,7 +28,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
-        <small className="absolute bottom-2 text-xs opacity-70">Repositório no <a href="https://github.com/fllaviacorreia/email-tester" target="_blank" rel="noopener noreferrer">GitHub</a></small>
+        <small className="absolute bottom-2 text-xs opacity-70">Repositório no <a className="text-indigo-500" href="https://github.com/fllaviacorreia/email-tester" target="_blank" rel="noopener noreferrer">GitHub</a></small>
       </body>
     </html>
   );
