@@ -17,60 +17,70 @@ type Body = {
 
 export async function POST(req: Request) {
   try {
+    // STEP: validateService + payload
     const body = (await req.json()) as Body;
-
     const { to, subject, message, smtp } = body;
 
     if (!to || !subject || !message) {
       return NextResponse.json(
-        { error: "Campos obrigatórios: to, subject, message" },
+        { error: "Campos obrigatórios: to, subject, message", step: "validateEmail" },
         { status: 400 }
       );
     }
-    console.log("SMTP recebido:", {...smtp});
-if (!smtp) {
-  return NextResponse.json(
-  { error: "Configurações SMTP obrigatórias" },
-  { status: 400 }
-  );
-}
-    const host = smtp?.host
-    const port = smtp?.port 
-    const user = smtp?.user 
-    const pass = smtp?.pass 
-    const from = smtp?.from 
+
+    const host = smtp?.host ?? process.env.SMTP_HOST;
+    const port = smtp?.port ?? Number(process.env.SMTP_PORT);
+    const user = smtp?.user ?? process.env.SMTP_USER;
+    const pass = smtp?.pass ?? process.env.SMTP_PASS;
+    const from = smtp?.from ?? process.env.SMTP_FROM;
     const secure =
-      typeof smtp?.secure === "boolean"
-        ? smtp.secure
-        : String(port) === "465"; // default heurística
+      typeof smtp?.secure === "boolean" ? smtp.secure : String(port) === "465";
 
     if (!host || !port || !user || !pass || !from) {
       return NextResponse.json(
-        { error: "SMTP incompleto (env ou credenciais informadas)." },
+        { error: "SMTP incompleto (env ou credenciais informadas).", step: "validateService" },
         { status: 400 }
       );
     }
 
-    const transporter = nodemailer.createTransport({
-      host,
-      port,
-      secure, // 465 true, 587 false
-      auth: { user, pass },
-    });
+    // STEP: buildTransporter
+    let transporter;
+    try {
+      transporter = nodemailer.createTransport({
+        host,
+        port,
+        secure,
+        auth: { user, pass },
+      });
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : "erro";
+      return NextResponse.json(
+        { error: `Falha ao montar nodemailer: ${errorMessage}`, step: "buildTransporter" },
+        { status: 500 }
+      );
+    }
 
-    await transporter.sendMail({
-      from,
-      to,
-      subject,
-      html: `<p>${escapeHtml(message).replace(/\n/g, "<br/>")}</p>`,
-    });
+    // STEP: sendEmail
+    try {
+      await transporter.sendMail({
+        from,
+        to,
+        subject,
+        html: `<p>${escapeHtml(message).replace(/\n/g, "<br/>")}</p>`,
+      });
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : "erro";
+      return NextResponse.json(
+        { error: `Falha ao enviar: ${errorMessage}`, step: "sendEmail" },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({ success: true });
-  } catch (error) {
-    const err = error as Error;
-    console.error(err);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erro inesperado";
     return NextResponse.json(
-      { error: err?.message ?? "Erro ao enviar email" },
+      { error: errorMessage, step: "sendEmail" },
       { status: 500 }
     );
   }
