@@ -431,6 +431,9 @@ export default function Home() {
 
         <p className="my-4">{status}</p>
       </section>
+
+       <small className="text-xs opacity-70">Repositório no <a className="text-indigo-500" href="https://github.com/fllaviacorreia/email-tester" target="_blank" rel="noopener noreferrer">GitHub</a></small>
+      
     </main>
   );
 }
