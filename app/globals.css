@@ -21,20 +21,22 @@
     --input: #2e2e2e;
   }
 }
-
 body {
   width: 100dvw;
-  height: 100dvh;
+  min-height: 100dvh; /* em vez de height */
+  height: auto;       /* permite crescer */
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start; /* topo no mobile evita corte */
+  padding: 16px;           /* respiro nas bordas */
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
 
-  input{
-    background: var(--input);
-  }
+body input,
+body textarea {
+  background: var(--input);
 }
 
 /* change the size of main tag to be responsive */
